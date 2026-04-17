@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENEM · Auditoria de Conhecimento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0d0d0f;
+  --bg2:#131316;
+  --bg3:#1a1a1f;
+  --bg4:#222228;
+  --border:#252530;
+  --border2:#32323f;
+  --text:#e8e8f0;
+  --text2:#8080a0;
+  --text3:#50506a;
+  --green:#4ade80;
+  --green-bg:rgba(74,222,128,.1);
+  --green-border:rgba(74,222,128,.22);
+  --yellow:#fbbf24;
+  --yellow-bg:rgba(251,191,36,.1);
+  --yellow-border:rgba(251,191,36,.22);
+  --red:#f87171;
+  --red-bg:rgba(248,113,113,.1);
+  --red-border:rgba(248,113,113,.22);
+  --accent:#7c6fff;
+  --accent2:#5a4fe0;
+  --accent-bg:rgba(124,111,255,.12);
+  --accent-border:rgba(124,111,255,.28);
+  --r:10px;--rs:7px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* SYNC BAR */
+.sync-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 22px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);gap:10px;flex-wrap:wrap}
+#sync-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .3s}
+.sdot.g{background:var(--green);box-shadow:0 0 7px var(--green)}
+.sdot.r{background:var(--red)}
+.sdot.y{background:var(--yellow)}
+.sdot.b{background:var(--accent);animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.setup-btn{padding:4px 12px;border-radius:var(--rs);border:1px solid var(--accent-border);background:var(--accent-bg);color:var(--accent);cursor:pointer;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;transition:all .15s}
+.setup-btn:hover{background:rgba(124,111,255,.22)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);z-index:999;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;max-width:540px;width:90%;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.7}
+.modal-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;font-size:12px;color:var(--text2)}
+.modal-step a{color:var(--accent);text-decoration:none}
+.modal-step strong{color:var(--text)}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.modal-field-grid{display:grid;gap:7px;margin-top:14px}
+.modal-field label{display:block;font-size:9.5px;font-weight:600;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.modal-field input{width:100%;border:1px solid var(--border2);border-radius:var(--rs);padding:7px 10px;font-size:11.5px;font-family:'DM Mono',monospace;color:var(--text);background:var(--bg3);transition:border-color .15s}
+.modal-field input:focus{outline:none;border-color:var(--accent)}
+.modal-field input::placeholder{color:var(--text3)}
+.modal-note{font-size:10.5px;color:var(--text3);margin-top:12px;padding:10px 12px;background:var(--bg3);border-radius:var(--rs);border-left:2px solid var(--accent);line-height:1.6}
+.modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+.btn-prim{padding:8px 20px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;transition:background .15s}
+.btn-prim:hover{background:var(--accent2)}
+.btn-sec{padding:8px 14px;border-radius:var(--rs);border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-size:12.5px;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-sec:hover{background:var(--bg3);color:var(--text)}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.brand-main{font-size:14px;font-weight:600;letter-spacing:-.2px}
+.brand-sub{font-size:11px;color:var(--text2);margin-top:1px}
+.global-stats{display:flex;gap:7px}
+.gs-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);font-size:11.5px}
+.gs-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.gs-n{font-weight:600;font-family:'DM Mono',monospace;font-size:12px}
+.gs-l{color:var(--text2)}
+
+/* NAV */
+.nav{display:flex;border-bottom:1px solid var(--border);padding:0 22px;overflow-x:auto;background:var(--bg2);gap:2px}
+.nb{padding:11px 15px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .15s;font-family:'DM Sans',sans-serif;border-radius:var(--rs) var(--rs) 0 0}
+.nb:hover{color:var(--text);background:var(--bg3)}
+.nb.on{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-bg)}
+
+/* CONTENT */
+.content{padding:22px;max-width:1200px}
+
+/* SUMM */
+.summ-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.sm-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;transition:border-color .15s}
+.sm-card:hover{border-color:var(--border2)}
+.sm-lbl{font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.sm-val{font-size:26px;font-weight:600;line-height:1;font-family:'DM Mono',monospace}
+.sm-bar{height:2px;border-radius:2px;background:var(--border);margin-top:10px}
+.sm-fill{height:100%;border-radius:2px;transition:width .5s ease}
+
+/* LEGEND */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;padding:9px 14px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);align-items:center}
+.leg-it{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text2)}
+.leg-sep{width:1px;height:14px;background:var(--border2)}
+.leg-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600}
+.underline-demo{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--green);font-size:11.5px;color:var(--text2)}
+
+/* SUBJECT */
+.subj-hd{display:flex;align-items:center;gap:12px;margin-bottom:10px;margin-top:6px}
+.subj-name{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--accent);white-space:nowrap}
+.subj-ct{font-size:10px;color:var(--text3)}
+.subj-line{flex:1;height:1px;background:var(--border)}
+
+/* TABLE */
+.tbl-card{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:8px;background:var(--bg2)}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+thead tr{background:var(--bg3)}
+th{padding:8px 12px;text-align:left;font-size:9.5px;font-weight:600;color:var(--text3);letter-spacing:.55px;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover td{background:var(--bg3)}
+
+.tema-n{font-size:12.5px;font-weight:500}
+.tema-n.cai-todo-ano{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--green)}
+.eixo-n{font-size:9.5px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
+
+/* PILLS */
+.tri-pill{display:inline-flex;flex-direction:column;align-items:center;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;white-space:nowrap;gap:1px;line-height:1.2;cursor:help}
+.tri-pill .tri-label{font-size:8.5px;font-weight:400;opacity:.8}
+.p-essencial{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.p-relevante{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.p-pontuacao{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+
+/* INPUTS */
+.qi-wrap{display:flex;align-items:center;gap:4px}
+.qi{width:40px;border:1px solid var(--border2);border-radius:var(--rs);padding:4px 6px;font-size:12px;background:var(--bg3);color:var(--text);text-align:center;font-family:'DM Mono',monospace;transition:border-color .15s}
+.qi:focus{outline:none;border-color:var(--accent)}
+.qi-sep{font-size:10px;color:var(--text3)}
+
+/* ARC */
+.pct-cell{display:flex;align-items:center;gap:8px}
+.arc-svg{overflow:visible}
+.arc-bg{fill:none;stroke:var(--border2);stroke-width:3}
+.arc-fg{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .4s,stroke .3s}
+.pct-label{font-size:11.5px;font-weight:600;min-width:30px;text-align:right;font-family:'DM Mono',monospace}
+
+/* REV */
+.rev-grp{display:flex;gap:4px;align-items:flex-start;justify-content:center}
+.rv-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+.rv{width:21px;height:21px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .12s;background:var(--bg3)}
+.rv:hover{border-color:var(--accent)}
+.rv input[type=checkbox]{width:11px;height:11px;margin:0;cursor:pointer;accent-color:var(--accent)}
+.rv-lbl{font-size:8px;color:var(--text3);font-family:'DM Mono',monospace}
+
+.fc-cb{display:flex;align-items:center;justify-content:center}
+input[type=checkbox]{cursor:pointer;accent-color:var(--accent)}
+
+/* DOMINIO */
+.dom-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:500;border:1px solid transparent;white-space:nowrap}
+.dom-0{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.dom-1{background:var(--yellow-bg);color:var(--yellow);border-color:var(--yellow-border)}
+.dom-2{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.dom-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.dd-0{background:var(--red)}.dd-1{background:var(--yellow)}.dd-2{background:var(--green)}
+
+/* ERR */
+.err-blk{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:28px}
+.err-hd{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.err-icon{width:18px;height:18px;background:var(--red-bg);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--red-border)}
+.err-title-txt{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text3)}
+.err-grid{display:grid;grid-template-columns:26px 1fr 1fr 1fr;gap:6px;align-items:center;margin-bottom:6px}
+.err-n{width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:500;color:var(--text3);font-family:'DM Mono',monospace}
+.err-i{border:1px solid var(--border);border-radius:var(--rs);padding:5px 9px;font-size:11.5px;background:var(--bg3);color:var(--text);width:100%;font-family:'DM Sans',sans-serif;transition:border-color .15s}
+.err-i:focus{outline:none;border-color:var(--accent)}
+.err-i::placeholder{color:var(--text3)}
+.err-col-lbl{font-size:9px;color:var(--text3);padding-left:4px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+
+/* REDAÇÃO */
+.red-hero{background:linear-gradient(135deg,var(--bg2) 60%,rgba(124,111,255,.07));border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:24px}
+.red-score-ring{position:relative;flex-shrink:0}
+.score-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.score-num{font-size:22px;font-weight:700;line-height:1;color:var(--accent);font-family:'DM Mono',monospace}
+.score-max{font-size:9.5px;color:var(--text3)}
+.red-hero-info{flex:1}
+.red-hero-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.red-hero-sub{font-size:12px;color:var(--text2);line-height:1.6}
+.red-sim-row{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.sim-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;font-size:11px;color:var(--text2);transition:all .12s;font-family:'DM Mono',monospace}
+.sim-btn.on{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);font-weight:600}
+
+.comp-list{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.comp-row{border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;background:var(--bg2);transition:border-color .15s}
+.comp-row:hover{border-color:var(--border2)}
+.comp-row.expanded .comp-body{display:block}
+.comp-top{display:flex;align-items:center;gap:12px;cursor:pointer}
+.comp-num{width:30px;height:30px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:'DM Mono',monospace}
+.comp-header-info{flex:1}
+.comp-htitle{font-size:13px;font-weight:600}
+.comp-hdesc{font-size:11.5px;color:var(--text2);margin-top:2px}
+.comp-right{display:flex;align-items:center;gap:10px}
+.comp-nota-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-bg);color:var(--accent);min-width:52px;text-align:center;border:1px solid var(--accent-border);font-family:'DM Mono',monospace}
+.comp-prog-mini{display:flex;gap:3px}
+.comp-check-dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--border2);transition:all .15s}
+.comp-check-dot.done{background:var(--green);border-color:var(--green-border)}
+.comp-chevron{font-size:11px;color:var(--text3);transition:transform .2s;width:16px;text-align:center}
+.comp-row.expanded .comp-chevron{transform:rotate(180deg)}
+.comp-body{display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px}
+.comp-items-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.comp-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:7px 10px;border-radius:var(--rs);border:1px solid var(--border);cursor:pointer;transition:all .12s;background:var(--bg3)}
+.comp-item:hover{border-color:var(--border2)}
+.comp-item.checked{background:var(--green-bg);border-color:var(--green-border);color:var(--green)}
+.comp-item input{width:13px;height:13px;cursor:pointer;accent-color:var(--green);flex-shrink:0}
+.nota-section{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nota-lbl{font-size:11px;color:var(--text2)}
+.nota-opts{display:flex;gap:4px}
+.nota-opt{width:38px;height:30px;border-radius:var(--rs);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--text2);transition:all .12s;background:var(--bg3);font-family:'DM Mono',monospace}
+.nota-opt:hover{border-color:var(--accent);color:var(--accent)}
+.nota-opt.on{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);font-weight:700}
+.comp-progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px}
+.comp-progress-fill{height:100%;border-radius:2px;background:var(--green);transition:width .3s}
+
+.rep-section{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2)}
+.rep-row{display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);transition:background .1s}
+.rep-row:last-child{border-bottom:none}
+.rep-row:hover{background:var(--bg3)}
+.rep-idx{font-size:10px;color:var(--text3);font-weight:600;text-align:center;font-family:'DM Mono',monospace}
+.rep-name{font-size:12.5px;font-weight:500}
+.rep-ex{font-size:10.5px;color:var(--text2);margin-top:2px;line-height:1.4}
+.rep-actions{display:flex;align-items:center;gap:8px}
+.rep-sel{border:1px solid var(--border2);border-radius:var(--rs);padding:4px 6px;font-size:13px;background:var(--bg3);cursor:pointer;appearance:none;width:44px;text-align:center;color:var(--text)}
+
+@media(max-width:680px){
+  .summ-bar{grid-template-columns:1fr 1fr}
+  .global-stats{display:none}
+  .comp-items-grid{grid-template-columns:1fr}
+  .err-grid{grid-template-columns:24px 1fr}
+  .content{padding:14px}
+  .red-hero{flex-direction:column;gap:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="sync-bar">
+  <div id="sync-status">
+    <span class="sdot" id="sdot"></span>
+    <span id="stxt">Verificando...</span>
+  </div>
+  <button class="setup-btn" onclick="openModal()">⚙ Firebase</button>
+</div>
+
+<div class="modal-overlay" id="fbModal">
+  <div class="modal-box">
+    <div class="modal-title">🔥 Configurar Firebase</div>
+    <div class="modal-sub">Configure uma vez e seus dados sincronizam em qualquer dispositivo — PC, celular, tablet.</div>
+    <div class="modal-step"><div class="step-num">1</div><div>Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → selecione seu projeto</div></div>
+    <div class="modal-step"><div class="step-num">2</div><div><strong>Build → Realtime Database</strong> → Criar banco → Modo de teste</div></div>
+    <div class="modal-step"><div class="step-num">3</div><div><strong>Authentication → Métodos de login → Anônimo</strong> → Ativar</div></div>
+    <div class="modal-step"><div class="step-num">4</div><div><strong>Project Settings → Seus apps → App Web</strong> → Copie a configuração</div></div>
+    <div class="modal-field-grid">
+      <div class="modal-field"><label>apiKey</label><input id="f-apiKey" placeholder="AIzaSy..."></div>
+      <div class="modal-field"><label>authDomain</label><input id="f-authDomain" placeholder="projeto.firebaseapp.com"></div>
+      <div class="modal-field"><label>databaseURL</label><input id="f-databaseURL" placeholder="https://projeto-default-rtdb.firebaseio.com"></div>
+      <div class="modal-field"><label>projectId</label><input id="f-projectId" placeholder="meu-projeto"></div>
+      <div class="modal-field"><label>storageBucket</label><input id="f-storageBucket" placeholder="projeto.appspot.com"></div>
+      <div class="modal-field"><label>messagingSenderId</label><input id="f-messagingSenderId" placeholder="123456789"></div>
+      <div class="modal-field"><label>appId</label><input id="f-appId" placeholder="1:123:web:abc..."></div>
+    </div>
+    <div class="modal-note">⚠️ Use o <strong>Realtime Database</strong> (não o Firestore). A databaseURL deve terminar em <code>.firebaseio.com</code>.</div>
+    <div class="modal-actions">
+      <button class="btn-sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn-prim" onclick="saveFirebaseConfig()">Salvar e Reconectar</button>
+    </div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">📚</div>
+    <div>
+      <div class="brand-main">Auditoria de Conhecimento · ENEM</div>
+      <div class="brand-sub">Frequência real por edição · Repetição espaçada · TRI</div>
+    </div>
+  </div>
+  <div class="global-stats" id="gstats"></div>
+</div>
+<div class="nav" id="navBar"></div>
+<div id="mainContent"></div>
+
+<script>
+// ══════════════════════════════════════════
+// FIREBASE — carregado dinamicamente, sem conflito com módulos
+// ══════════════════════════════════════════
+(async function() {
+  let cfg = null;
+  try { cfg = JSON.parse(localStorage.getItem('_fbCfg') || 'null'); } catch(e){}
+
+  if (!cfg || !cfg.apiKey) {
+    setSync('', 'Modo offline (configure o Firebase)');
+    return;
+  }
+  if (!cfg.databaseURL) {
+    setSync('r', 'Falta o databaseURL — clique em ⚙ Firebase');
+    return;
+  }
+
+  try {
+    setSync('y', 'Conectando...');
+    const { initializeApp }       = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getDatabase, ref, set, get } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+    const { getAuth, signInAnonymously, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+
+    const app  = initializeApp(cfg);
+    const db   = getDatabase(app);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return;
+      window._FBUID = user.uid;
+      setSync('g', 'Sincronizado');
+
+      // Baixa dados remotos e mescla com local
+      try {
+        const snap = await get(ref(db, 'u/' + user.uid + '/d'));
+        if (snap.exists()) {
+          const remote = snap.val();
+          const local  = lsAll();
+          lsSaveAll(Object.assign({}, local, remote));
+          goTab(window._TAB || 'cn');
+        }
+      } catch(e) { console.warn('FB load', e); }
+    });
+
+    signInAnonymously(auth).catch(e => setSync('r', 'Erro auth: ' + e.code));
+
+    window._fbWrite = async (path, val) => {
+      if (!window._FBUID) return;
+      try { await set(ref(db, 'u/' + window._FBUID + '/d/' + path), val); }
+      catch(e) { console.warn('FB write', e); }
+    };
+
+  } catch(e) {
+    setSync('r', 'Firebase erro: ' + String(e).slice(0, 50));
+    console.error(e);
+  }
+})();
+
+function setSync(cls, txt) {
+  const d = document.getElementById('sdot');
+  const t = document.getElementById('stxt');
+  if(d) d.className = 'sdot' + (cls ? ' ' + cls : '');
+  if(t) t.textContent = txt;
+}
+
+// ══════════════════════════════════════════
+// LOCAL STORAGE
+// ══════════════════════════════════════════
+const LS = 'enem_v4';
+function lsAll()      { try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){return{}} }
+function lsSaveAll(d) { try{localStorage.setItem(LS,JSON.stringify(d))}catch(e){} }
+function lsRead(path) {
+  let cur = lsAll();
+  for(const p of path.split('/')) { if(cur==null)return null; cur=cur[p]; }
+  return cur??null;
+}
+function lsWrite(path, val) {
+  const d=lsAll(), parts=path.split('/');
+  let cur=d;
+  for(let i=0;i<parts.length-1;i++){if(!cur[parts[i]])cur[parts[i]]={};cur=cur[parts[i]];}
+  cur[parts[parts.length-1]]=val;
+  lsSaveAll(d);
+}
+
+let _st=null;
+function saveData(path, val) {
+  lsWrite(path, val);
+  if(typeof window._fbWrite==='function'){
+    setSync('b','Salvando...');
+    clearTimeout(_st);
+    _st=setTimeout(async()=>{
+      await window._fbWrite(path,val);
+      setSync('g','Sincronizado');
+    },700);
+  }
+}
+const readData = lsRead;
+
+// ══════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════
+function openModal(){
+  document.getElementById('fbModal').classList.add('open');
+  try{
+    const c=JSON.parse(localStorage.getItem('_fbCfg')||'null');
+    if(c)['apiKey','authDomain','databaseURL','projectId','storageBucket','messagingSenderId','appId']
+      .forEach(k=>{const el=document.getElementById('f-'+k);if(el&&c[k])el.value=c[k];});
+  }catch(e){}
+}
+function closeModal(){document.getElementById('fbModal').classList.remove('open');}
+function saveFirebaseConfig(){
+  const keys=['apiKey','authDomain','databaseURL','projectId','storageBucket','messagingSenderId','appId'];
+  const cfg={};let empty=false;
+  keys.forEach(k=>{const v=document.getElementById('f-'+k)?.value?.trim();if(!v)empty=true;cfg[k]=v;});
+  if(empty){alert('Preencha todos os campos.');return;}
+  if(!cfg.databaseURL.includes('firebaseio.com')){
+    alert('❌ databaseURL inválida!\n\nDeve terminar em .firebaseio.com\nVerifique se criou o Realtime Database (não Firestore) no console Firebase.');
+    return;
+  }
+  localStorage.setItem('_fbCfg',JSON.stringify(cfg));
+  alert('✅ Configuração salva!\nA página vai recarregar para conectar.');
+  location.reload();
+}
+document.getElementById('fbModal').addEventListener('click',e=>{if(e.target.id==='fbModal')closeModal();});
+
+// ══════════════════════════════════════════
+// DADOS ENEM
+// ══════════════════════════════════════════
+const TRI={
+  essencial:{cls:'p-essencial',top:'Priorizar',  sub:'Cai todo ano'},
+  relevante: {cls:'p-relevante',top:'Às vezes',  sub:'Às vezes cai'},
+  pontuacao: {cls:'p-pontuacao',top:'Raramente', sub:'Raramente cai'},
+};
+
+const D={
+  cn:[
+    {s:'Química',t:[
+      ['Tabela periódica e propriedades',        'Química Geral',   'essencial',true],
+      ['Ligações químicas',                       'Química Geral',   'essencial',true],
+      ['Estequiometria',                          'Química Geral',   'essencial',true],
+      ['Soluções e concentrações',                'Físico-Química',  'essencial',true],
+      ['Termoquímica',                            'Físico-Química',  'essencial',true],
+      ['Eletroquímica (pilhas e eletrólise)',     'Físico-Química',  'essencial',true],
+      ['Cinética química',                        'Físico-Química',  'relevante',false],
+      ['Equilíbrio químico',                      'Físico-Química',  'pontuacao',false],
+      ['Funções orgânicas',                       'Orgânica',        'essencial',true],
+      ['Isomeria',                                'Orgânica',        'relevante',false],
+      ['Reações orgânicas',                       'Orgânica',        'relevante',false],
+      ['Polímeros e petroquímica',                'Orgânica',        'essencial',true],
+      ['Química ambiental / agrotóxicos',         'Contextual',      'essencial',true],
+    ]},
+    {s:'Física',t:[
+      ['Cinemática (MRU e MRUV)',                 'Mecânica',        'essencial',true],
+      ['Dinâmica — Leis de Newton',               'Mecânica',        'essencial',true],
+      ['Energia, trabalho e potência',            'Mecânica',        'essencial',true],
+      ['Hidrostática',                            'Mecânica',        'relevante',false],
+      ['Ondas e som',                             'Ondulatória',     'essencial',true],
+      ['Óptica geométrica',                       'Ondulatória',     'relevante',false],
+      ['Termologia e termodinâmica',              'Termologia',      'essencial',true],
+      ['Eletrostática',                           'Eletromagnetismo','relevante',false],
+      ['Eletrodinâmica (circuitos)',               'Eletromagnetismo','relevante',false],
+      ['Magnetismo e indução',                    'Eletromagnetismo','pontuacao',false],
+      ['Física moderna (radioatividade, fótons)', 'Física Moderna',  'essencial',true],
+    ]},
+    {s:'Biologia',t:[
+      ['Citologia — célula e organelas',          'Biologia Celular','essencial',true],
+      ['Divisão celular (mitose / meiose)',        'Biologia Celular','essencial',true],
+      ['Ecologia e cadeias alimentares',          'Ecologia',        'essencial',true],
+      ['Biomas brasileiros',                      'Ecologia',        'essencial',true],
+      ['Fluxos de energia e matéria',             'Ecologia',        'relevante',false],
+      ['Genética mendeliana',                     'Genética',        'essencial',true],
+      ['Genética molecular (DNA / RNA)',          'Genética',        'relevante',false],
+      ['Biotecnologia e transgênicos',            'Genética',        'relevante',false],
+      ['Evolução (Darwin, especiação)',           'Evolução',        'relevante',false],
+      ['Sistemática e classificação',             'Evolução',        'pontuacao',false],
+      ['Fisiologia humana',                       'Fisiologia',      'relevante',false],
+      ['Doenças, saúde e imunologia',             'Fisiologia',      'essencial',true],
+    ]},
+  ],
+  ch:[
+    {s:'História',t:[
+      ['Brasil Colonial e Escravidão',            'Hist. Brasil',    'essencial',true],
+      ['Independência e Império',                 'Hist. Brasil',    'essencial',true],
+      ['República Velha e Era Vargas',            'Hist. Brasil',    'essencial',true],
+      ['Ditadura Militar e redemocratização',     'Hist. Brasil',    'essencial',true],
+      ['Revoluções burguesas (França e Ingl.)',   'Hist. Geral',     'essencial',true],
+      ['Imperialismo e neocolonialismo',          'Hist. Geral',     'relevante',false],
+      ['Primeira Guerra Mundial',                'Hist. Geral',     'essencial',true],
+      ['Nazifascismo e Segunda Guerra',           'Hist. Geral',     'essencial',true],
+      ['Guerra Fria',                             'Hist. Geral',     'relevante',false],
+      ['Descolonização da África e Ásia',         'Hist. Geral',     'pontuacao',false],
+      ['Revolução Industrial',                    'Hist. Geral',     'essencial',true],
+    ]},
+    {s:'Geografia',t:[
+      ['Cartografia e orientação',                'Cartografia',     'essencial',true],
+      ['Clima e domínios morfoclimáticos',        'Física',          'essencial',true],
+      ['Geopolítica e conflitos mundiais',        'Humana',          'relevante',false],
+      ['Urbanização brasileira',                  'Humana',          'essencial',true],
+      ['Agropecuária e agroindústria',            'Humana',          'relevante',false],
+      ['Fontes de energia',                       'Recursos',        'essencial',true],
+      ['Questões ambientais globais',             'Ambiental',       'essencial',true],
+      ['Globalização e regionalização',           'Econ. Global',    'relevante',false],
+      ['Êxodo rural e migrações',                'Humana',          'relevante',false],
+      ['Geopolítica brasileira',                  'Humana',          'pontuacao',false],
+    ]},
+    {s:'Filosofia e Sociologia',t:[
+      ['Ética e política (Platão / Aristóteles)', 'Filosofia',       'essencial',true],
+      ['Iluminismo e contrato social',            'Filosofia',       'essencial',true],
+      ['Filosofia pré-socrática',                'Filosofia',       'pontuacao',false],
+      ['Filosofia contemporânea',                'Filosofia',       'pontuacao',false],
+      ['Sociologia clássica (Marx/Durkheim/Weber)','Sociologia',    'essencial',true],
+      ['Desigualdade e estratificação social',    'Sociologia',      'essencial',true],
+      ['Movimentos sociais e cidadania',          'Sociologia',      'essencial',true],
+      ['Indústria cultural e meios de comunic.', 'Sociologia',      'relevante',false],
+    ]},
+  ],
+  mt:[
+    {s:'Matemática',t:[
+      ['Porcentagem, razão e proporção',          'Aritmética',      'essencial',true],
+      ['Matemática financeira e juros',           'Aritmética',      'essencial',true],
+      ['Funções do 1º e 2º grau',                'Álgebra',         'essencial',true],
+      ['Funções exponencial e logarítmica',       'Álgebra',         'essencial',true],
+      ['Progressões (PA e PG)',                   'Álgebra',         'relevante',false],
+      ['Trigonometria',                           'Trigonometria',   'relevante',false],
+      ['Geometria plana (áreas e perímetros)',    'Geometria',       'essencial',true],
+      ['Geometria espacial (volumes)',            'Geometria',       'essencial',true],
+      ['Geometria analítica',                     'Geometria',       'relevante',false],
+      ['Probabilidade',                           'Combinatória',    'essencial',true],
+      ['Combinatória — princípio da contagem',   'Combinatória',    'relevante',false],
+      ['Estatística e análise de dados',          'Estatística',     'essencial',true],
+      ['Matrizes e determinantes',               'Álgebra',         'pontuacao',false],
+      ['Polinômios e equações',                   'Álgebra',         'pontuacao',false],
+    ]},
+  ],
+  lc:[
+    {s:'Português e Literatura',t:[
+      ['Interpretação de texto',                  'Interpretação',   'essencial',true],
+      ['Variação linguística',                    'Linguística',     'essencial',true],
+      ['Coesão e coerência textual',              'Linguística',     'essencial',true],
+      ['Figuras de linguagem',                    'Estilística',     'relevante',false],
+      ['Gêneros textuais',                        'Interpretação',   'essencial',true],
+      ['Literatura brasileira — Modernismo',      'Literatura',      'relevante',false],
+      ['Literatura bras. — Realismo/Romantismo',  'Literatura',      'relevante',false],
+      ['Literatura portuguesa',                   'Literatura',      'pontuacao',false],
+      ['Análise de charges e publicidade',        'Semiótica',       'essencial',true],
+      ['Linguagem não-verbal e multimodal',      'Semiótica',       'essencial',true],
+    ]},
+    {s:'Língua Estrangeira (Inglês / Espanhol)',t:[
+      ['Leitura e compreensão de texto',          'Compreensão',     'essencial',true],
+      ['Vocabulário em contexto',                'Vocabulário',     'essencial',true],
+      ['Inferência de significado',               'Estratégias',     'essencial',true],
+      ['Gêneros textuais em língua estrangeira', 'Gêneros',         'relevante',false],
+    ]},
+  ],
+};
+
+const COMPS=[
+  {n:1,title:'Domínio da língua escrita',desc:'Norma-padrão e convenções da escrita formal',items:['Ortografia correta','Acentuação adequada','Concordância verbal','Concordância nominal','Regência verbal e nominal','Pontuação adequada']},
+  {n:2,title:'Compreensão da proposta',desc:'Texto dissertativo-argumentativo sem fuga ao tema',items:['Tema desenvolvido corretamente','Sem fuga ou tangenciamento','Gênero textual correto','Repertório sociocultural presente','Sem cópia da coletânea']},
+  {n:3,title:'Organização dos argumentos',desc:'Argumentação consistente com progressão temática',items:['Ponto de vista claro','Progressão sem contradição','Dados e fatos como evidência','Argumentos pertinentes ao tema','Conclusão coerente com a tese']},
+  {n:4,title:'Mecanismos de coesão',desc:'Recursos que articulam as partes do texto',items:['Conectivos de adição','Conectivos de oposição','Conectivos de causa/consequência','Referenciação (pronomes, sinônimos)','Paragrafação correta']},
+  {n:5,title:'Proposta de intervenção',desc:'Ação concreta respeitando os direitos humanos',items:['Agente da ação definido','Ação concreta e viável','Modo de execução detalhado','Finalidade ou efeito claro','Respeito aos direitos humanos']},
+];
+const REP=[
+  {n:1,name:'Direitos humanos e minorias',ex:'Simone de Beauvoir · IBGE · Estatuto da Criança'},
+  {n:2,name:'Tecnologia e sociedade digital',ex:'Byung-Chul Han · Sherry Turkle · IA e trabalho'},
+  {n:3,name:'Meio ambiente e sustentabilidade',ex:'Acordo de Paris · Chico Mendes · biopirataria'},
+  {n:4,name:'Educação e desigualdade',ex:'Paulo Freire · Anísio Teixeira · PNAD Educação'},
+  {n:5,name:'Saúde pública e desafios do SUS',ex:'Oswaldo Cruz · pandemia · epidemiologia'},
+  {n:6,name:'Segurança pública e violência',ex:'Michel Foucault · encarceramento · Fórum Bras. Seg.'},
+  {n:7,name:'Trabalho e desemprego estrutural',ex:'Uberização · Reforma Trabalhista · gig economy'},
+  {n:8,name:'Cultura, identidade e diversidade',ex:'Stuart Hall · apagamento cultural · indígenas'},
+  {n:9,name:'Democracia e desinformação',ex:'Hannah Arendt · fake news · polarização'},
+  {n:10,name:'Crise habitacional e urbanização',ex:'Milton Santos · déficit habitacional · periferias'},
+];
+const TABS=[
+  {k:'cn',l:'⚗ Ciências da Natureza'},
+  {k:'ch',l:'🌍 Ciências Humanas'},
+  {k:'mt',l:'📐 Matemática'},
+  {k:'lc',l:'📖 Linguagens'},
+  {k:'red',l:'✍ Redação'},
+];
+
+// ══════════════════════════════════════════
+// BUILDERS
+// ══════════════════════════════════════════
+function pillH(t){
+  const i=TRI[t];
+  if(!i)return'';
+  return`<span class="tri-pill ${i.cls}" title="${i.sub}"><span>${i.top}</span><span class="tri-label">${i.sub}</span></span>`;
+}
+function arcSVG(id){
+  const R=14,C=2*Math.PI*R;
+  return`<svg class="arc-svg" width="36" height="36" viewBox="0 0 36 36" style="transform:rotate(-90deg)">
+    <circle class="arc-bg" cx="18" cy="18" r="${R}"/>
+    <circle class="arc-fg" id="arc-${id}" cx="18" cy="18" r="${R}" stroke="var(--green)" stroke-dasharray="${C}" stroke-dashoffset="${C}"/>
+  </svg>`;
+}
+function pctColor(p){return p>=70?'var(--green)':p>=40?'var(--yellow)':'var(--red)'}
+function domChip(p){
+  if(p===null)return`<span class="dom-chip dom-0"><span class="dom-dot dd-0"></span>Não iniciado</span>`;
+  if(p>=70)   return`<span class="dom-chip dom-2"><span class="dom-dot dd-2"></span>Dominado</span>`;
+  if(p>=40)   return`<span class="dom-chip dom-1"><span class="dom-dot dd-1"></span>Em progresso</span>`;
+  return`<span class="dom-chip dom-0"><span class="dom-dot dd-0"></span>Abaixo 40%</span>`;
+}
+function buildRow(uid,tema,eixo,tri,rec){
+  const qf=readData(uid+'/qf')||'';
+  const qa=readData(uid+'/qa')||'';
+  const fc=readData(uid+'/fc')||false;
+  const rv=readData(uid+'/rv')||[false,false,false];
+  return`<tr id="row-${uid}">
+    <td style="min-width:150px">
+      <div class="tema-n${rec?' cai-todo-ano':''}">${tema}</div>
+      <div class="eixo-n">${eixo}</div>
+    </td>
+    <td>${pillH(tri)}</td>
+    <td><div class="qi-wrap">
+      <input class="qi" id="qf-${uid}" type="number" min="0" placeholder="—" value="${qf}" oninput="onInput('${uid}')">
+      <span class="qi-sep">/</span>
+      <input class="qi" id="qa-${uid}" type="number" min="0" placeholder="—" value="${qa}" oninput="onInput('${uid}')">
+    </div></td>
+    <td><div class="pct-cell">${arcSVG(uid)}<span class="pct-label" id="pct-${uid}" style="color:var(--text3)">—</span></div></td>
+    <td class="fc-cb"><input type="checkbox" style="width:14px;height:14px" ${fc?'checked':''} onchange="saveData('${uid}/fc',this.checked)"></td>
+    <td><div class="rev-grp">${['24h','7d','30d'].map((l,i)=>`
+      <div class="rv-col">
+        <div class="rv"><input type="checkbox" ${rv[i]?'checked':''} onchange="onRev('${uid}',${i},this.checked)"></div>
+        <div class="rv-lbl">${l}</div>
+      </div>`).join('')}</div></td>
+    <td id="dom-${uid}">${domChip(null)}</td>
+  </tr>`;
+}
+function onInput(uid){
+  calc(uid);
+  saveData(uid+'/qf',document.getElementById('qf-'+uid)?.value||'');
+  saveData(uid+'/qa',document.getElementById('qa-'+uid)?.value||'');
+}
+function onRev(uid,i,v){const r=readData(uid+'/rv')||[false,false,false];r[i]=v;saveData(uid+'/rv',r);}
+function calc(uid){
+  const fEl=document.getElementById('qf-'+uid);
+  const aEl=document.getElementById('qa-'+uid);
+  const pEl=document.getElementById('pct-'+uid);
+  const dEl=document.getElementById('dom-'+uid);
+  const arcEl=document.getElementById('arc-'+uid);
+  if(!fEl||!aEl)return;
+  const f=parseInt(fEl.value)||0,a=parseInt(aEl.value)||0;
+  const C=2*Math.PI*14;
+  if(f<=0){
+    if(pEl){pEl.textContent='—';pEl.style.color='var(--text3)'}
+    if(arcEl)arcEl.style.strokeDashoffset=C;
+    if(dEl)dEl.innerHTML=domChip(null);
+    upGlobal();upSumm();return;
+  }
+  const p=Math.round(Math.min(a,f)/f*100);
+  const col=pctColor(p);
+  if(pEl){pEl.textContent=p+'%';pEl.style.color=col}
+  if(arcEl){arcEl.style.stroke=col;arcEl.style.strokeDashoffset=C-(C*p/100)}
+  if(dEl)dEl.innerHTML=domChip(p);
+  upGlobal();upSumm();
+}
+function upGlobal(){
+  const all=document.querySelectorAll('[id^="dom-"]');
+  let r=0,y=0,g=0;
+  all.forEach(el=>{const t=el.textContent.trim();if(t.includes('Dominado'))g++;else if(t.includes('progresso'))y++;else r++;});
+  const gs=document.getElementById('gstats');if(!gs)return;
+  gs.innerHTML=`
+    <div class="gs-pill"><div class="gs-dot" style="background:var(--red)"></div><span class="gs-n">${r}</span><span class="gs-l">não iniciado</span></div>
+    <div class="gs-pill"><div class="gs-dot" style="background:var(--yellow)"></div><span class="gs-n">${y}</span><span class="gs-l">progresso</span></div>
+    <div class="gs-pill"><div class="gs-dot" style="background:var(--green)"></div><span class="gs-n">${g}</span><span class="gs-l">dominado</span></div>`;
+}
+function upSumm(){
+  const all=document.querySelectorAll('[id^="dom-"]');
+  const tot=all.length;let r=0,y=0,g=0;
+  all.forEach(el=>{const t=el.textContent.trim();if(t.includes('Dominado'))g++;else if(t.includes('progresso'))y++;else r++;});
+  const pct=v=>tot?Math.round(v*100/tot):0;
+  [['smD',tot,100,'var(--accent)'],['smG',g,pct(g),'var(--green)'],['smY',y,pct(y),'var(--yellow)'],['smR',r,pct(r),'var(--red)']].forEach(([id,val,p,col])=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.querySelector('.sm-val').textContent=val;
+    const f=el.querySelector('.sm-fill');if(f){f.style.width=p+'%';f.style.background=col;}
+  });
+}
+function buildSubj(s,pfx){
+  const rows=s.t.map((t,i)=>buildRow(pfx+'_'+i,t[0],t[1],t[2],t[3]===true)).join('');
+  const errs=[0,1,2].map(n=>`<div class="err-grid">
+    <div class="err-n">${n+1}</div>
+    <input class="err-i" placeholder="Tema / questão" value="${readData(pfx+'_e/'+n+'/t')||''}" oninput="saveData('${pfx}_e/${n}/t',this.value)">
+    <input class="err-i" placeholder="Motivo do erro" value="${readData(pfx+'_e/'+n+'/m')||''}" oninput="saveData('${pfx}_e/${n}/m',this.value)">
+    <input class="err-i" placeholder="Ação corretiva" value="${readData(pfx+'_e/'+n+'/a')||''}" oninput="saveData('${pfx}_e/${n}/a',this.value)">
+  </div>`).join('');
+  return`<div style="margin-bottom:28px">
+    <div class="subj-hd"><span class="subj-name">${s.s}</span><span class="subj-ct">${s.t.length} temas</span><div class="subj-line"></div></div>
+    <div class="tbl-card"><table>
+      <colgroup><col style="width:27%"><col style="width:12%"><col style="width:15%"><col style="width:13%"><col style="width:6%"><col style="width:13%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Tema</th><th>Frequência</th><th>Fez / Acertou</th><th>% Acerto</th><th title="Flashcards">FC</th><th>Revisões</th><th>Domínio</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  </div>
+  <div class="err-blk">
+    <div class="err-hd">
+      <div class="err-icon"><svg width="10" height="10" viewBox="0 0 10 10"><text x="5" y="8.5" text-anchor="middle" font-size="9" fill="var(--red)" font-weight="700">!</text></svg></div>
+      <span class="err-title-txt">Caderno de erros — ${s.s}</span>
+    </div>
+    <div class="err-grid"><div></div><div class="err-col-lbl">Tema / questão</div><div class="err-col-lbl">Motivo do erro</div><div class="err-col-lbl">Ação corretiva</div></div>
+    ${errs}
+  </div>`;
+}
+function buildSec(k){
+  if(k==='red')return buildRed();
+  const gs=D[k];
+  const summ=`<div class="summ-bar">
+    <div class="sm-card" id="smD"><div class="sm-lbl">Total</div><div class="sm-val">—</div><div class="sm-bar"><div class="sm-fill" style="width:100%;background:var(--accent)"></div></div></div>
+    <div class="sm-card" id="smG"><div class="sm-lbl">Dominados</div><div class="sm-val">0</div><div class="sm-bar"><div class="sm-fill"></div></div></div>
+    <div class="sm-card" id="smY"><div class="sm-lbl">Em progresso</div><div class="sm-val">0</div><div class="sm-bar"><div class="sm-fill"></div></div></div>
+    <div class="sm-card" id="smR"><div class="sm-lbl">Não iniciados</div><div class="sm-val">—</div><div class="sm-bar"><div class="sm-fill"></div></div></div>
+  </div>
+  <div class="legend">
+    <span class="leg-it"><span class="leg-badge p-essencial">Priorizar</span>Cai todo ano</span>
+    <div class="leg-sep"></div>
+    <span class="leg-it"><span class="leg-badge p-relevante">Às vezes</span>Às vezes cai</span>
+    <div class="leg-sep"></div>
+    <span class="leg-it"><span class="leg-badge p-pontuacao">Raramente</span>Raramente cai</span>
+    <div class="leg-sep"></div>
+    <span class="underline-demo">Sublinhado</span><span class="leg-it" style="margin-left:4px">= presente em toda edição</span>
+  </div>`;
+  return summ+gs.map(g=>buildSubj(g,k+'_'+g.s.slice(0,3))).join('');
+}
+function buildRed(){
+  const cards=COMPS.map(c=>{
+    const dots=c.items.map((_,i)=>`<span class="comp-check-dot" id="dot-c${c.n}-${i}"></span>`).join('');
+    const items=c.items.map((item,i)=>{
+      const sv=readData('red/i/'+c.n+'-'+i)||false;
+      return`<div class="comp-item${sv?' checked':''}" id="ci-c${c.n}-${i}" onclick="tgItem(${c.n},${i})">
+        <input type="checkbox" id="chk-c${c.n}-${i}" ${sv?'checked':''} onclick="event.stopPropagation();tgItem(${c.n},${i})">
+        <span>${item}</span>
+      </div>`;
+    }).join('');
+    const sn=readData('red/n/'+c.n);
+    const notas=[0,40,80,120,160,200].map(v=>`<div class="nota-opt${sn===v?' on':''}" onclick="selNota(this,${c.n})" data-v="${v}">${v}</div>`).join('');
+    return`<div class="comp-row" id="comp-${c.n}">
+      <div class="comp-top" onclick="tgComp(${c.n})">
+        <div class="comp-num">${c.n}</div>
+        <div class="comp-header-info"><div class="comp-htitle">${c.title}</div><div class="comp-hdesc">${c.desc}</div></div>
+        <div class="comp-right">
+          <div class="comp-nota-badge" id="nb-${c.n}">${sn!=null?sn+' pts':'—'}</div>
+          <div class="comp-prog-mini">${dots}</div>
+          <div class="comp-chevron">▾</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <div class="comp-items-grid">${items}</div>
+        <div class="comp-progress-bar"><div class="comp-progress-fill" id="cpf-${c.n}" style="width:0%"></div></div>
+        <div class="nota-section" style="margin-top:12px">
+          <span class="nota-lbl">Nota desta competência</span>
+          <div class="nota-opts" id="nd-${c.n}">${notas}</div>
+          <span style="font-size:10.5px;color:var(--text3);margin-left:6px">pts</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const repH=REP.map((r,i)=>{
+    const ss=readData('red/r/'+i+'/s')||'🔴';
+    const sc=readData('red/r/'+i+'/c')||false;
+    return`<div class="rep-row">
+      <div class="rep-idx">${r.n}</div>
+      <div><div class="rep-name">${r.name}</div><div class="rep-ex">${r.ex}</div></div>
+      <div class="rep-actions">
+        <select class="rep-sel" onchange="saveData('red/r/${i}/s',this.value)">
+          <option ${ss==='🔴'?'selected':''}>🔴</option>
+          <option ${ss==='🟡'?'selected':''}>🟡</option>
+          <option ${ss==='🟢'?'selected':''}>🟢</option>
+        </select>
+        <input type="checkbox" ${sc?'checked':''} style="width:14px;height:14px" onchange="saveData('red/r/${i}/c',this.checked)">
+      </div>
+    </div>`;
+  }).join('');
+  return`
+  <div class="red-hero">
+    <div class="red-score-ring">
+      <svg width="88" height="88" viewBox="0 0 88 88" style="transform:rotate(-90deg)">
+        <circle cx="44" cy="44" r="36" fill="none" stroke="var(--border2)" stroke-width="6"/>
+        <circle id="red-arc" cx="44" cy="44" r="36" fill="none" stroke="var(--accent)" stroke-width="6"
+          stroke-linecap="round" stroke-dasharray="${2*Math.PI*36}" stroke-dashoffset="${2*Math.PI*36}" style="transition:stroke-dashoffset .5s"/>
+      </svg>
+      <div class="score-val"><div class="score-num" id="red-total">0</div><div class="score-max">/ 1000</div></div>
+    </div>
+    <div class="red-hero-info">
+      <div class="red-hero-title">Pontuação da Redação</div>
+      <div class="red-hero-sub">Atribua notas a cada competência.<br>Total calculado automaticamente.</div>
+      <div class="red-sim-row">
+        <span style="font-size:10.5px;color:var(--text3)">Simulações:</span>
+        ${[1,2,3,4,5,6,7,8].map(n=>{
+          const s=readData('red/sim/'+n)||false;
+          return`<button class="sim-btn${s?' on':''}" onclick="tgSim(this,${n})">${n}</button>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>
+  <div class="subj-hd" style="margin-bottom:14px"><span class="subj-name">Competências</span><span class="subj-ct">clique para expandir</span><div class="subj-line"></div></div>
+  <div class="comp-list">${cards}</div>
+  <div class="subj-hd" style="margin-bottom:14px;margin-top:8px"><span class="subj-name">Repertório temático</span><span class="subj-ct">10 eixos prioritários</span><div class="subj-line"></div></div>
+  <div class="rep-section">${repH}</div>`;
+}
+function tgSim(btn,n){btn.classList.toggle('on');saveData('red/sim/'+n,btn.classList.contains('on'));}
+function tgComp(n){document.getElementById('comp-'+n).classList.toggle('expanded');}
+function tgItem(cn,ii){
+  const ci=document.getElementById(`ci-c${cn}-${ii}`);
+  const chk=document.getElementById(`chk-c${cn}-${ii}`);
+  const dot=document.getElementById(`dot-c${cn}-${ii}`);
+  const checked=!chk.checked;
+  chk.checked=checked;ci.classList.toggle('checked',checked);
+  if(dot)dot.classList.toggle('done',checked);
+  saveData('red/i/'+cn+'-'+ii,checked);
+  const comp=COMPS.find(c=>c.n===cn);
+  let done=0;
+  comp.items.forEach((_,i)=>{if(document.getElementById(`chk-c${cn}-${i}`)?.checked)done++;});
+  const pf=document.getElementById('cpf-'+cn);if(pf)pf.style.width=Math.round(done/comp.items.length*100)+'%';
+}
+function selNota(el,n){
+  document.querySelectorAll(`#nd-${n} .nota-opt`).forEach(d=>d.classList.remove('on'));
+  el.classList.add('on');
+  const v=parseInt(el.dataset.v);
+  const nb=document.getElementById('nb-'+n);if(nb)nb.textContent=v+' pts';
+  saveData('red/n/'+n,v);updRed();
+}
+function updRed(){
+  let tot=0;COMPS.forEach(c=>{const on=document.querySelector(`#nd-${c.n} .nota-opt.on`);if(on)tot+=parseInt(on.dataset.v||0);});
+  const el=document.getElementById('red-total');if(el)el.textContent=tot;
+  const arc=document.getElementById('red-arc');
+  if(arc){const C=2*Math.PI*36;arc.style.strokeDashoffset=C-(C*tot/1000);}
+}
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+window._TAB='cn';
+function goTab(k){
+  window._TAB=k;
+  document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  document.getElementById('mainContent').innerHTML=`<div class="content">${buildSec(k)}</div>`;
+  document.querySelectorAll('[id^="qf-"]').forEach(el=>{if(el.value)calc(el.id.replace('qf-',''));});
+  if(k==='red')updRed();
+  upGlobal();upSumm();
+}
+const nav=document.getElementById('navBar');
+TABS.forEach(t=>{
+  const b=document.createElement('button');
+  b.className='nb'+(t.k==='cn'?' on':'');
+  b.dataset.k=t.k;b.textContent=t.l;
+  b.onclick=()=>goTab(t.k);
+  nav.appendChild(b);
+});
+goTab('cn');
+</script>
+</body>
+</html>
